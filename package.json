@@ -4,6 +4,9 @@
   "keywords": [
     "react"
   ],
+  "scripts": {
+  "build": "vite build"
+}
   "version": "19.1.1",
   "homepage": "https://react.dev/",
   "bugs": "https://github.com/facebook/react/issues",
