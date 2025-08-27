@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matteo Longo - Digital Marketing & AI Specialist</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Professional Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Serif+Pro:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- AOS animations removed to avoid external dependencies -->
+    
+    <!-- React and Three.js CDNs for ES6 modules -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18",
+        "react-dom": "https://esm.sh/react-dom@18",
+        "three": "https://esm.sh/three@0.158.0",
+        "@react-three/fiber": "https://esm.sh/@react-three/fiber@8"
+      }
+    }
+    </script>
+</head>
+<body>
+    <!-- Texture Overlay -->
+    <div class="texture-overlay"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#about" class="nav-link">Chi Sono</a></li>
+                <li><a href="#education" class="nav-link">Formazione</a></li>
+                <li><a href="#experience" class="nav-link">Esperienza</a></li>
+                <li><a href="#projects" class="nav-link">Progetti</a></li>
+                <li><a href="#skills" class="nav-link">Competenze</a></li>
+                <li><a href="#contact" class="nav-link">Contatti</a></li>
+            </ul>
+            <div class="nav-toggle" id="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-bg">
+        </div>
+        <div id="lights"></div>
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <div class="animated-gradient-text">
+                        <div class="text-content">Benvenuto!</div>
+                    </div>
+                </h1>
+                <p class="hero-subtitle">
+                    Questo è il mio portfolio, e io sono Matteo, esperto in digital marketing e intelligenza artificiale
+                </p>
+                <p class="hero-description">
+                    Unisco creatività e tecnologia per trasformare le idee in progetti concreti e misurabili, aiutando le aziende a crescere e a connettersi efficacemente con il loro pubblico
+                </p>
+                <div class="hero-buttons">
+                    <a href="#projects" class="btn btn-primary">
+                        <span>Scopri i Progetti</span>
+                        <div class="btn-glow"></div>
+                    </a>
+                    <a href="#contact" class="btn btn-secondary">
+                        <span>Collaboriamo</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-line"></div>
+            <span>Scorri per esplorare</span>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about animate-on-scroll">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <h2 class="section-title">Chi Sono</h2>
+                <div class="section-line"></div>
+                <p class="section-subtitle">La mia passione per il digitale</p>
+            </div>
+            <div class="about-content">
+                <div class="about-image">
+                </div>
+                <div class="about-text animate-on-scroll">
+                    <div class="text-content">
+                        <p class="about-intro">
+                            Sono un <strong>professionista del digital marketing</strong> con una solida base di studio in 
+                            <strong>Relazioni Internazionali per il Marketing</strong> e mi sto perfezionando con il percorso di 
+                            <strong>Tecnico Superiore per il Marketing e la Comunicazione</strong>.
+                        </p>
+                        <p>
+                            Sebbene il mio percorso pratico sia appena iniziato, ho già ottenuto risultati significativi: 
+                            ho lanciato la mia attività di freelancer, <strong>attirando i primi clienti</strong> grazie a una 
+                            <strong>landing page ottimizzata</strong> e a una strategia digitale completa.
+                        </p>
+                        <p>
+                            La mia passione è esplorare le nuove frontiere del digitale, unendo creatività e tecnologia 
+                            per trasformare le idee in progetti concreti e misurabili, aiutando le aziende a crescere 
+                            e a connettersi in modo efficace con il loro pubblico.
+                        </p>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-progress-bar"></div>
+                                <span class="stat-number" data-target="380">0</span>
+                                <span class="stat-label">ore di formazione professionale</span>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-progress-bar"></div>
+                                <span class="stat-number" data-target="420">0</span>
+                                <span class="stat-label">ore di formazione scolastica</span>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-progress-bar"></div>
+                                <span class="stat-number" data-target="∞">0</span>
+                                <span class="stat-label">ore di formazione autonoma</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education Section -->
+    <section id="education" class="education animate-on-scroll">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Formazione</h2>
+                <div class="section-line"></div>
+                <p class="section-subtitle">Il mio percorso di crescita</p>
+            </div>
+            <div class="education-carousel">
+                <div class="notebook-container">
+                    <div class="notebook active" data-education="0">
+                        <div class="notebook-cover">
+                            <img src="assets/svg/notebook-1.svg" alt="Quaderno Relazioni Internazionali" class="notebook-svg">
+                        </div>
+                        <div class="notebook-content">
+                            <div class="content-page">
+                                <h4>Istruzione superiore</h4>
+                                <p>Focus su marketing internazionale, comunicazione digitale e strategie commerciali globali. Solida base teorica per comprendere le dinamiche del marketing moderno.</p>
+                                <ul>
+                                    <li>Marketing Internazionale</li>
+                                    <li>Comunicazione Digitale</li>
+                                    <li>Strategie Commerciali</li>
+                                    <li>Analisi dei Mercati Globali</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="notebook" data-education="1">
+                        <div class="notebook-cover">
+                            <img src="assets/svg/notebook-2.svg" alt="Quaderno Tecnico Superiore" class="notebook-svg">
+                        </div>
+                        <div class="notebook-content">
+                            <div class="content-page">
+                                <h4>Tecnico Superiore per il Marketing e la Comunicazione</h4>
+                                <p>Percorso di specializzazione tecnica in marketing digitale e comunicazione aziendale. Focus pratico su strumenti e strategie del marketing contemporaneo.</p>
+                                <ul>
+                                    <li>Digital Marketing Avanzato</li>
+                                    <li>Social Media Strategy</li>
+                                    <li>Content Marketing</li>
+                                    <li>Analytics e Performance</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="experience animate-on-scroll">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Esperienza Professionale</h2>
+                <div class="section-line"></div>
+                <p class="section-subtitle">I miei risultati concreti</p>
+            </div>
+            <div class="experience-container">
+                <div class="main-folder-container">
+                    <div class="main-file-folder" onclick="openMainFolder()">
+                        <div class="folder-icon"></div>
+                        <h3 class="folder-title">Esperienza Professionale</h3>
+                        <p class="folder-subtitle">Clicca per visualizzare i fascicoli</p>
+                    </div>
+                    
+                    <div class="sub-folders" id="subFolders" style="display: none;">
+                        <div class="sub-folder freelancer-folder" onclick="openSubFolder('freelancer')">
+                            <div class="sub-folder-icon"></div>
+                            <h4>Esperienza Freelancer</h4>
+                            <p>2025</p>
+                        </div>
+                        
+                        <div class="sub-folder internship-folder" onclick="openSubFolder('internship')">
+                            <div class="sub-folder-icon"></div>
+                            <h4>Tirocinio presso Azienda</h4>
+                            <p>2025</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenuto Freelancer -->
+                    <div class="folder-content-detail" id="freelancerContent" style="display: none;">
+                        <div class="content-header">
+                            <button class="back-btn" onclick="backToFolders()">← Torna ai fascicoli</button>
+                            <h3>Esperienza Freelancer</h3>
+                        </div>
+                        <div class="content-body">
+                            <div class="period">2025</div>
+                            <p class="company">Attività Indipendente</p>
+                            <p class="description">
+                                Attività freelancer nel 2025 con focus su servizi digitali completi 
+                                per clienti e aziende del territorio.
+                            </p>
+                            <div class="achievements">
+                                <h4>Servizi Offerti:</h4>
+                                <ul>
+                                    <li>Gestione social media per brand e aziende</li>
+                                    <li>Creazione contenuti digitali e visual</li>
+                                    <li>Creazione siti web responsive e moderni</li>
+                                    <li>Creazione grafiche per marketing e comunicazione</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenuto Tirocinio -->
+                    <div class="folder-content-detail" id="internshipContent" style="display: none;">
+                        <div class="content-header">
+                            <button class="back-btn" onclick="backToFolders()">← Torna ai fascicoli</button>
+                            <h3>Tirocinio presso Azienda</h3>
+                        </div>
+                        <div class="content-body">
+                            <div class="period">2025</div>
+                            <p class="company">Closer BG</p>
+                            <p class="description">
+                                Tirocinante in Digital Marketing presso Closer BG nel 2025. 
+                                Contribuito alla gestione e ottimizzazione di campagne di marketing digitale tramite social e web.
+                            </p>
+                            <div class="achievements">
+                                <h4>Competenze Acquisite:</h4>
+                                <ul>
+                                    <li>Collaborato all'implementazione di una nuova strategia di content marketing</li>
+                                    <li>Produzione di contenuti coinvolgenti per i social media</li>
+                                    <li>Miglioramento della presenza online dell'azienda</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="projects animate-on-scroll">
+        <div class="silk-background" id="projects-silk"></div>
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Progetti - Case Study</h2>
+                <div class="section-line"></div>
+                <p class="section-subtitle">I miei successi documentati</p>
+            </div>
+            <div class="projects-grid">
+                <!-- Project 1: Synergy Hub -->
+                <div class="project-card animate-on-scroll">
+                    <div class="project-image">
+                        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop" alt="Synergy Hub Website">
+                        <div class="project-overlay">
+                            <button class="project-btn" onclick="openProjectModal('project1')">
+                                <span>Scopri di più</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-category">Sviluppo Web</div>
+                        <h3 class="project-title">Synergy Hub - Sito Web Aziendale</h3>
+                        <p class="project-description">
+                            Sviluppo completo di un sito web professionale per startup IT specializzata in soluzioni cloud.
+                        </p>
+                        <div class="project-stats">
+                            <span class="stat">📅 6 settimane</span>
+                    <span class="stat">📈 10% conversione</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2: Eterea Cosmesi -->
+                <div class="project-card animate-on-scroll">
+                    <div class="project-image">
+                        <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&h=400&fit=crop" alt="Eterea Cosmesi Social Media">
+                        <div class="project-overlay">
+                            <button class="project-btn" onclick="openProjectModal('project2')">
+                                <span>Scopri di più</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-category">Social Media Marketing</div>
+                        <h3 class="project-title">Eterea Cosmesi - Brand Strategy</h3>
+                        <p class="project-description">
+                            Strategia completa di social media marketing per brand di cosmetici biologici.
+                        </p>
+                        <div class="project-stats">
+                            <span class="stat">👥 +150% follower</span>
+                    <span class="stat">❤️ +20% engagement</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3: Botanic Flavors -->
+                <div class="project-card animate-on-scroll">
+                    <div class="project-image">
+                        <img src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&h=400&fit=crop" alt="Botanic Flavors E-commerce">
+                        <div class="project-overlay">
+                            <button class="project-btn" onclick="openProjectModal('project3')">
+                                <span>Scopri di più</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <div class="project-category">E-commerce & AI</div>
+                        <h3 class="project-title">Botanic Flavors - Chatbot & SEO</h3>
+                        <p class="project-description">
+                            Implementazione chatbot AI e ottimizzazione SEO per e-commerce enogastronomico.
+                        </p>
+                        <div class="project-stats">
+                            <span class="stat">🤖 25% automazione</span>
+                    <span class="stat">🔍 +30% traffico</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="skills animate-on-scroll">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Competenze e Strumenti</h2>
+                <div class="section-line"></div>
+                <p class="section-subtitle">Le mie specializzazioni tecniche</p>
+            </div>
+            
+            <div class="skills-scroll-container">
+                <div class="skills-viewport">
+                    <div class="skills-track">
+                        <!-- Categoria 1: Siti Web & Chatbot -->
+                        <div class="skill-category-slide active" data-category="0">
+                            <div class="skill-category-content">
+                                <h3>Siti Web & Chatbot</h3>
+                                <div class="skills-list">
+                                    <div class="skill-item">
+                                        🌐
+                                        <span>WordPress</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        💻
+                                        <span>Framer AI</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        ⚙️
+                                        <span>Web Builder</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        🧠
+                                        <span>Prompt Engineering</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        🤖
+                                        <span>Chatbot Development</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        🔌
+                                        <span>Gestione Plugin</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Categoria 2: Analisi & Dati -->
+                        <div class="skill-category-slide" data-category="1">
+                            <div class="skill-category-content">
+                                <h3>Analisi & Dati</h3>
+                                <div class="skills-list">
+                                    <div class="skill-item">
+                                        📈
+                                        <span>Google Analytics 4</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        🔎
+                                        <span>Search Console</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        📊
+                                        <span>Data Reporting</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        📑
+                                        <span>Business Presentations</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Categoria 3: Social Media Marketing -->
+                        <div class="skill-category-slide" data-category="2">
+                            <div class="skill-category-content">
+                                <h3>Social Media Marketing</h3>
+                                <div class="skills-list">
+                                    <div class="skill-item">
+                                        🏢
+                                        <span>Meta Business Suite</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        👥
+                                        <span>Facebook</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        📷
+                                        <span>Instagram</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        💼
+                                        <span>LinkedIn</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        📅
+                                        <span>Piani Editoriali</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        🎨
+                                        <span>Canva</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Categoria 4: Branding & Multimedia -->
+                        <div class="skill-category-slide" data-category="3">
+                            <div class="skill-category-content">
+                                <h3>Branding & Multimedia</h3>
+                                <div class="skills-list">
+                                    <div class="skill-item">
+                                        ™️
+                                        <span>Brand Identity</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        ✏️
+                                        <span>Logo Design</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        🖼️
+                                        <span>Grafiche Social</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        📸
+                                        <span>Fotografia</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        🚁
+                                        <span>Riprese Drone</span>
+                                    </div>
+                                    <div class="skill-item">
+                                        🎬
+                                        <span>DaVinci Resolve</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Indicatori di navigazione -->
+                <div class="skills-indicators">
+                    <div class="indicator active" data-target="0"></div>
+                    <div class="indicator" data-target="1"></div>
+                    <div class="indicator" data-target="2"></div>
+                    <div class="indicator" data-target="3"></div>
+                </div>
+                
+                <!-- Istruzioni per l'utente -->
+                <div class="scroll-hint">
+                    <span>🖱️ Passa il mouse e scorri per navigare</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact animate-on-scroll">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Collaboriamo Insieme</h2>
+                <div class="section-line"></div>
+                <p class="section-subtitle">Trasformo le tue idee in successi digitali</p>
+            </div>
+            <div class="contact-content">
+                <div class="contact-cards">
+                    <a href="mailto:mat.longo1207@gmail.com" class="contact-card email-card animate-on-scroll">
+                        <div class="contact-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </div>
+                        <div class="contact-card-content">
+                            <h3>Email</h3>
+                            <p>Scrivimi una mail</p>
+                            <span class="contact-card-action">mat.longo1207@gmail.com</span>
+                        </div>
+                        <div class="contact-card-arrow">→</div>
+                    </a>
+
+                    <a href="https://www.linkedin.com/feed/" target="_blank" class="contact-card linkedin-card animate-on-scroll">
+                        <div class="contact-card-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                            </svg>
+                        </div>
+                        <div class="contact-card-content">
+                            <h3>LinkedIn</h3>
+                            <p>Connettiti con me</p>
+                            <span class="contact-card-action">Profilo professionale</span>
+                        </div>
+                        <div class="contact-card-arrow">→</div>
+                    </a>
+
+                    <a href="https://wa.me/393515061770" target="_blank" class="contact-card whatsapp-card animate-on-scroll">
+                        <div class="contact-card-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                            </svg>
+                        </div>
+                        <div class="contact-card-content">
+                            <h3>WhatsApp</h3>
+                            <p>Chatta con me</p>
+                            <span class="contact-card-action">+39 351 506 1770</span>
+                        </div>
+                        <div class="contact-card-arrow">→</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>Matteo Longo</h3>
+                    <p>Digital Marketing & AI Specialist</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Matteo Longo. Tutti i diritti riservati.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Project Modals -->
+    <div id="project1" class="project-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeProjectModal()">&times;</span>
+            <div class="modal-header">
+                <h2>Synergy Hub - Case Study Completo</h2>
+                <div class="project-tags">
+                    <span class="tag">WordPress</span>
+                    <span class="tag">Framer AI</span>
+                    <span class="tag">Web Design</span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="case-study-section">
+                    <h3>Il Cliente</h3>
+                    <p>Synergy Hub, una startup di consulenza IT specializzata in soluzioni cloud per piccole imprese.</p>
+                </div>
+                <div class="case-study-section">
+                    <h3>L'Obiettivo</h3>
+                    <p>Creare un sito web professionale e funzionale per presentare i servizi e generare nuovi contatti qualificati.</p>
+                </div>
+                <div class="case-study-section">
+                    <h3>La Strategia</h3>
+                    <p>Ho utilizzato Framer AI e WordPress per costruire il sito, concentrandomi su un design pulito e su una navigazione intuitiva. Ho integrato plugin essenziali per la funzionalità, come un modulo di contatto avanzato e una galleria di case study.</p>
+                </div>
+                <div class="case-study-section">
+                    <h3>I Risultati</h3>
+                    <ul>
+                        <li>Sito completato in 6 settimane</li>
+                        <li>Tasso di conversione del 10% nel primo mese</li>
+                        <li>Design responsive perfetto su tutti i dispositivi</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="project2" class="project-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeProjectModal()">&times;</span>
+            <div class="modal-header">
+                <h2>Eterea Cosmesi - Case Study Completo</h2>
+                <div class="project-tags">
+                    <span class="tag">Instagram</span>
+                    <span class="tag">Canva</span>
+                    <span class="tag">DaVinci Resolve</span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="case-study-section">
+                    <h3>Il Cliente</h3>
+                    <p>Eterea Cosmesi, un piccolo brand di prodotti cosmetici artigianali e biologici venduti online.</p>
+                </div>
+                <div class="case-study-section">
+                    <h3>L'Obiettivo</h3>
+                    <p>Aumentare la brand awareness e l'engagement su Instagram, creando una forte identità visiva.</p>
+                </div>
+                <div class="case-study-section">
+                    <h3>La Strategia</h3>
+                    <p>Ho redatto un piano editoriale dettagliato per Instagram, focalizzato sui valori del brand. Ho utilizzato il mio drone per creare riprese aeree uniche dei campi da cui provengono gli ingredienti.</p>
+                </div>
+                <div class="case-study-section">
+                    <h3>I Risultati</h3>
+                    <ul>
+                        <li>+150% follower organici in 4 mesi (1.000 → 2.500)</li>
+                        <li>+20% engagement rate medio</li>
+                        <li>Identità visiva coerente e riconoscibile</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="project3" class="project-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeProjectModal()">&times;</span>
+            <div class="modal-header">
+                <h2>Botanica - Case Study Completo</h2>
+                <div class="project-tags">
+                    <span class="tag">Chatbot</span>
+                    <span class="tag">SEO</span>
+                    <span class="tag">Google Analytics</span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="case-study-section">
+                    <h3>Il Cliente</h3>
+                    <p>Botanic Flavors, un e-commerce di prodotti enogastronomici regionali che spedisce in tutta Europa.</p>
+                </div>
+                <div class="case-study-section">
+                    <h3>L'Obiettivo</h3>
+                    <p>Migliorare l'assistenza clienti e la gestione delle richieste sul sito, e contemporaneamente aumentare la visibilità sui motori di ricerca.</p>
+                </div>
+                <div class="case-study-section">
+                    <h3>La Strategia</h3>
+                    <p>Ho configurato un chatbot sul sito e l'ho addestrato con prompt specifici per rispondere alle domande frequenti degli utenti. Ho parallelamente usato Google Analytics 4 e Google Search Console per ottimizzazioni SEO.</p>
+                </div>
+                <div class="case-study-section">
+                    <h3>I Risultati</h3>
+                    <ul>
+                        <li>25% delle interazioni gestite dal chatbot</li>
+                        <li>+30% traffico organico in 3 mesi</li>
+                        <li>Riduzione significativa richieste email</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AOS script removed to avoid external dependencies -->
+    <script type="module" src="src/main.js"></script>
+    <script type="module" src="skills-grid.js"></script>
+</body>
+</html>

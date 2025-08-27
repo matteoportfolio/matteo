@@ -1,0 +1,784 @@
+import { useEffect, useRef } from "react";
+import * as THREE from 'three';
+import { BloomEffect, EffectComposer, EffectPass, RenderPass, SMAAEffect, SMAAPreset } from 'postprocessing';
+
+import './Hyperspeed.css';
+
+// Uniforms per le distorsioni
+const mountainUniforms = {
+  uFreq: { value: new THREE.Vector3(3, 6, 10) },
+  uAmp: { value: new THREE.Vector3(30, 30, 20) }
+};
+
+const xyUniforms = {
+  uFreq: { value: new THREE.Vector2(5, 2) },
+  uAmp: { value: new THREE.Vector2(25, 15) }
+};
+
+const LongRaceUniforms = {
+  uFreq: { value: new THREE.Vector2(2, 3) },
+  uAmp: { value: new THREE.Vector2(35, 10) }
+};
+
+const turbulentUniforms = {
+  uFreq: { value: new THREE.Vector4(4, 8, 8, 1) },
+  uAmp: { value: new THREE.Vector4(25, 5, 10, 10) }
+};
+
+const deepUniforms = {
+  uFreq: { value: new THREE.Vector2(4, 8) },
+  uAmp: { value: new THREE.Vector2(10, 20) },
+  uPowY: { value: new THREE.Vector2(20, 2) }
+};
+
+let nsin = val => Math.sin(val) * 0.5 + 0.5;
+
+const distortions = {
+  mountainDistortion: {
+    uniforms: mountainUniforms,
+    getDistortion: `
+      uniform vec3 uAmp;
+      uniform vec3 uFreq;
+      uniform float uTime;
+      #define PI 3.14159265358979
+      float nsin(float val){
+        return sin(val) * 0.5 + 0.5;
+      }
+      vec3 getDistortion(float progress){
+        float movementProgressFix = 0.02;
+        return vec3( 
+          cos(progress * PI * uFreq.x + uTime) * uAmp.x - cos(movementProgressFix * PI * uFreq.x + uTime) * uAmp.x,
+          nsin(progress * PI * uFreq.y + uTime) * uAmp.y - nsin(movementProgressFix * PI * uFreq.y + uTime) * uAmp.y,
+          nsin(progress * PI * uFreq.z + uTime) * uAmp.z - nsin(movementProgressFix * PI * uFreq.z + uTime) * uAmp.z
+        );
+      }
+    `,
+    getJS: (progress, time) => {
+      const movementProgressFix = 0.02;
+      return [
+        Math.cos(progress * Math.PI * mountainUniforms.uFreq.value.x + time) * mountainUniforms.uAmp.value.x - Math.cos(movementProgressFix * Math.PI * mountainUniforms.uFreq.value.x + time) * mountainUniforms.uAmp.value.x,
+        nsin(progress * Math.PI * mountainUniforms.uFreq.value.y + time) * mountainUniforms.uAmp.value.y - nsin(movementProgressFix * Math.PI * mountainUniforms.uFreq.value.y + time) * mountainUniforms.uAmp.value.y,
+        nsin(progress * Math.PI * mountainUniforms.uFreq.value.z + time) * mountainUniforms.uAmp.value.z - nsin(movementProgressFix * Math.PI * mountainUniforms.uFreq.value.z + time) * mountainUniforms.uAmp.value.z
+      ];
+    }
+  },
+  xyDistortion: {
+    uniforms: xyUniforms,
+    getDistortion: `
+      uniform vec4 uFreq;
+      uniform vec4 uAmp;
+      #define PI 3.14159265358979
+      vec3 getDistortion(float progress){
+        float movementProgressFix = 0.02;
+        return vec3( 
+          cos(progress * PI * uFreq.x + uTime) * uAmp.x - cos(movementProgressFix * PI * uFreq.x + uTime) * uAmp.x,
+          cos(progress * PI * uFreq.y + uTime) * uAmp.y - cos(movementProgressFix * PI * uFreq.y + uTime) * uAmp.y,
+          0.
+        );
+      }
+    `,
+    getJS: (progress, time) => {
+      const movementProgressFix = 0.02;
+      return [
+        Math.cos(progress * Math.PI * xyUniforms.uFreq.value.x + time) * xyUniforms.uAmp.value.x - Math.cos(movementProgressFix * Math.PI * xyUniforms.uFreq.value.x + time) * xyUniforms.uAmp.value.x,
+        Math.cos(progress * Math.PI * xyUniforms.uFreq.value.y + time) * xyUniforms.uAmp.value.y - Math.cos(movementProgressFix * Math.PI * xyUniforms.uFreq.value.y + time) * xyUniforms.uAmp.value.y,
+        0
+      ];
+    }
+  },
+  LongRaceDistortion: {
+    uniforms: LongRaceUniforms,
+    getDistortion: `
+      uniform vec4 uFreq;
+      uniform vec4 uAmp;
+      #define PI 3.14159265358979
+      vec3 getDistortion(float progress){
+        float movementProgressFix = 0.02;
+        return vec3( 
+          cos(progress * PI * uFreq.x + uTime) * uAmp.x - cos(movementProgressFix * PI * uFreq.x + uTime) * uAmp.x,
+          0.,
+          cos(progress * PI * uFreq.y + uTime) * uAmp.y - cos(movementProgressFix * PI * uFreq.y + uTime) * uAmp.y
+        );
+      }
+    `,
+    getJS: (progress, time) => {
+      const movementProgressFix = 0.02;
+      return [
+        Math.cos(progress * Math.PI * LongRaceUniforms.uFreq.value.x + time) * LongRaceUniforms.uAmp.value.x - Math.cos(movementProgressFix * Math.PI * LongRaceUniforms.uFreq.value.x + time) * LongRaceUniforms.uAmp.value.x,
+        0,
+        Math.cos(progress * Math.PI * LongRaceUniforms.uFreq.value.y + time) * LongRaceUniforms.uAmp.value.y - Math.cos(movementProgressFix * Math.PI * LongRaceUniforms.uFreq.value.y + time) * LongRaceUniforms.uAmp.value.y
+      ];
+    }
+  },
+  turbulentDistortion: {
+    uniforms: turbulentUniforms,
+    getDistortion: `
+      uniform vec2 uFreq;
+      uniform vec2 uAmp;
+      #define PI 3.14159265358979
+      float nsin(float val){
+        return sin(val) * 0.5 + 0.5;
+      }
+      vec3 getDistortion(float progress){
+        float movementProgressFix = 0.02;
+        return vec3( 
+          cos(progress * PI * uFreq.x + uTime) * uAmp.x - cos(movementProgressFix * PI * uFreq.x + uTime) * uAmp.x + cos(progress * PI * uFreq.z + uTime) * uAmp.z - cos(movementProgressFix * PI * uFreq.z + uTime) * uAmp.z,
+          nsin(progress * PI * uFreq.y + uTime) * uAmp.y - nsin(movementProgressFix * PI * uFreq.y + uTime) * uAmp.y,
+          nsin(progress * PI * uFreq.w + uTime) * uAmp.w - nsin(movementProgressFix * PI * uFreq.w + uTime) * uAmp.w
+        );
+      }
+    `,
+    getJS: (progress, time) => {
+      const movementProgressFix = 0.02;
+      return [
+        Math.cos(progress * Math.PI * turbulentUniforms.uFreq.value.x + time) * turbulentUniforms.uAmp.value.x - Math.cos(movementProgressFix * Math.PI * turbulentUniforms.uFreq.value.x + time) * turbulentUniforms.uAmp.value.x + Math.cos(progress * Math.PI * turbulentUniforms.uFreq.value.z + time) * turbulentUniforms.uAmp.value.z - Math.cos(movementProgressFix * Math.PI * turbulentUniforms.uFreq.value.z + time) * turbulentUniforms.uAmp.value.z,
+        nsin(progress * Math.PI * turbulentUniforms.uFreq.value.y + time) * turbulentUniforms.uAmp.value.y - nsin(movementProgressFix * Math.PI * turbulentUniforms.uFreq.value.y + time) * turbulentUniforms.uAmp.value.y,
+        nsin(progress * Math.PI * turbulentUniforms.uFreq.value.w + time) * turbulentUniforms.uAmp.value.w - nsin(movementProgressFix * Math.PI * turbulentUniforms.uFreq.value.w + time) * turbulentUniforms.uAmp.value.w
+      ];
+    }
+  },
+  turbulentDistortionStill: {
+    uniforms: turbulentUniforms,
+    getDistortion: `
+      uniform vec4 uFreq;
+      uniform vec4 uAmp;
+      #define PI 3.14159265358979
+      float nsin(float val){
+        return sin(val) * 0.5 + 0.5;
+      }
+      vec3 getDistortion(float progress){
+        return vec3( 
+          cos(progress * PI * uFreq.x) * uAmp.x + cos(progress * PI * uFreq.z) * uAmp.z,
+          nsin(progress * PI * uFreq.y) * uAmp.y,
+          nsin(progress * PI * uFreq.w) * uAmp.w
+        );
+      }
+    `,
+    getJS: (progress, time) => {
+      return [
+        Math.cos(progress * Math.PI * turbulentUniforms.uFreq.value.x) * turbulentUniforms.uAmp.value.x + Math.cos(progress * Math.PI * turbulentUniforms.uFreq.value.z) * turbulentUniforms.uAmp.value.z,
+        nsin(progress * Math.PI * turbulentUniforms.uFreq.value.y) * turbulentUniforms.uAmp.value.y,
+        nsin(progress * Math.PI * turbulentUniforms.uFreq.value.w) * turbulentUniforms.uAmp.value.w
+      ];
+    }
+  },
+  deepDistortionStill: {
+    uniforms: deepUniforms,
+    getDistortion: `
+      uniform vec2 uFreq;
+      uniform vec2 uAmp;
+      uniform vec2 uPowY;
+      #define PI 3.14159265358979
+      float nsin(float val){
+        return sin(val) * 0.5 + 0.5;
+      }
+      vec3 getDistortion(float progress){
+        return vec3( 
+          cos(progress * PI * uFreq.x) * uAmp.x,
+          pow(nsin(progress * PI * uFreq.y), uPowY.x) * uAmp.y,
+          pow(nsin(progress * PI * uFreq.y), uPowY.y) * uAmp.y
+        );
+      }
+    `,
+    getJS: (progress, time) => {
+      return [
+        Math.cos(progress * Math.PI * deepUniforms.uFreq.value.x) * deepUniforms.uAmp.value.x,
+        Math.pow(nsin(progress * Math.PI * deepUniforms.uFreq.value.y), deepUniforms.uPowY.value.x) * deepUniforms.uAmp.value.y,
+        Math.pow(nsin(progress * Math.PI * deepUniforms.uFreq.value.y), deepUniforms.uPowY.value.y) * deepUniforms.uAmp.value.y
+      ];
+    }
+  }
+};
+
+function getDistortionX(distortionName, progress, time) {
+  return distortions[distortionName].getJS(progress, time)[0];
+}
+
+function getDistortionY(distortionName, progress, time) {
+  return distortions[distortionName].getJS(progress, time)[1];
+}
+
+function getDistortion(distortionName, progress, time) {
+  return distortions[distortionName].getJS(progress, time);
+}
+
+export class App {
+  constructor(container, options = {}) {
+    this.options = options;
+    this.container = container;
+    this.camera = null;
+    this.scene = null;
+    this.renderer = null;
+    this.composer = null;
+    this.road = null;
+    this.carLights = null;
+    this.lightsSticks = null;
+    this.speedUpTarget = 0;
+    this.speedUp = 0;
+    this.timeOffset = 0;
+    this.tick = this.tick.bind(this);
+    this.init = this.init.bind(this);
+    this.onWindowResize = this.onWindowResize.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onTouchStart = this.onTouchStart.bind(this);
+    this.onTouchEnd = this.onTouchEnd.bind(this);
+  }
+
+  init() {
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(
+      this.options.fov,
+      this.container.offsetWidth / this.container.offsetHeight,
+      0.1,
+      10000
+    );
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: false,
+      alpha: true
+    });
+    this.renderer.setSize(this.container.offsetWidth, this.container.offsetHeight);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.container.appendChild(this.renderer.domElement);
+
+    this.composer = new EffectComposer(this.renderer);
+    this.renderPass = new RenderPass(this.scene, this.camera);
+    this.composer.addPass(this.renderPass);
+
+    this.initPasses();
+    this.road = new Road(this, this.options);
+    this.carLights = new CarLights(this, this.options);
+    this.lightsSticks = new LightsSticks(this, this.options);
+
+    this.scene.add(this.road.mesh);
+    this.scene.add(this.carLights.mesh);
+    this.scene.add(this.lightsSticks.mesh);
+
+    this.onWindowResize();
+    window.addEventListener('resize', this.onWindowResize.bind(this));
+    window.addEventListener('mousedown', this.onMouseDown);
+    window.addEventListener('mouseup', this.onMouseUp);
+    window.addEventListener('touchstart', this.onTouchStart);
+    window.addEventListener('touchend', this.onTouchEnd);
+
+    this.tick();
+  }
+
+  onWindowResize() {
+    this.camera.aspect = this.container.offsetWidth / this.container.offsetHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(this.container.offsetWidth, this.container.offsetHeight);
+    this.composer.setSize(this.container.offsetWidth, this.container.offsetHeight);
+  }
+
+  initPasses() {
+    const bloomEffect = new BloomEffect({
+      blendFunction: 23,
+      luminanceThreshold: 0.1,
+      luminanceSmoothing: 0.9,
+      height: 480
+    });
+    const effectPass = new EffectPass(this.camera, bloomEffect);
+    this.composer.addPass(effectPass);
+  }
+
+  loadAssets() {
+    return Promise.resolve();
+  }
+
+  onMouseDown() {
+    this.speedUpTarget = this.options.speedUp;
+    this.options.onSpeedUp(this.speedUpTarget);
+  }
+
+  onMouseUp() {
+    this.speedUpTarget = 0;
+    this.options.onSlowDown(this.speedUpTarget);
+  }
+
+  onTouchStart() {
+    this.speedUpTarget = this.options.speedUp;
+    this.options.onSpeedUp(this.speedUpTarget);
+  }
+
+  onTouchEnd() {
+    this.speedUpTarget = 0;
+    this.options.onSlowDown(this.speedUpTarget);
+  }
+
+  update(delta) {
+    let lerpPercentage = Math.exp(-(-60 * Math.log(2)) * delta);
+    this.speedUp += (this.speedUpTarget - this.speedUp) * lerpPercentage;
+    this.timeOffset += this.speedUp * delta;
+
+    let time = Date.now() * 0.0005 + this.timeOffset;
+
+    this.road.update(time);
+    this.carLights.update(time);
+    this.lightsSticks.update(time);
+
+    let updateCamera = false;
+    let fovChange = THREE.MathUtils.lerp(this.camera.fov, this.options.fov + this.speedUp * this.options.fovSpeedUp, lerpPercentage);
+    if (fovChange !== this.camera.fov) {
+      this.camera.fov = fovChange;
+      updateCamera = true;
+    }
+
+    if (updateCamera) {
+      this.camera.updateProjectionMatrix();
+    }
+  }
+
+  render(delta) {
+    this.composer.render(delta);
+  }
+
+  dispose() {
+    this.scene.traverse((child) => {
+      if (child.geometry) {
+        child.geometry.dispose();
+      }
+      if (child.material) {
+        if (Array.isArray(child.material)) {
+          child.material.forEach(material => material.dispose());
+        } else {
+          child.material.dispose();
+        }
+      }
+    });
+    this.renderer.dispose();
+    this.composer.dispose();
+    window.removeEventListener('resize', this.onWindowResize.bind(this));
+    window.removeEventListener('mousedown', this.onMouseDown);
+    window.removeEventListener('mouseup', this.onMouseUp);
+    window.removeEventListener('touchstart', this.onTouchStart);
+    window.removeEventListener('touchend', this.onTouchEnd);
+  }
+
+  tick() {
+    this.update(0.016);
+    this.render(0.016);
+    requestAnimationFrame(this.tick);
+  }
+}
+
+class CarLights {
+  constructor(webgl, options) {
+    this.webgl = webgl;
+    this.options = options;
+    this.init();
+  }
+
+  init() {
+    const curve = new THREE.LineCurve3(
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, 0, -1)
+    );
+    const baseGeometry = new THREE.TubeGeometry(curve, 25, 1, 8, false);
+
+    const instanced = new THREE.InstancedBufferGeometry().copy(baseGeometry);
+    instanced.instanceCount = this.options.lightPairsPerRoadWay * 2;
+
+    const aOffset = [];
+    const aMetrics = [];
+    const aColor = [];
+
+    for (let i = 0; i < this.options.lightPairsPerRoadWay; i++) {
+      const radius = Math.random() * (this.options.carLightsRadius[1] - this.options.carLightsRadius[0]) + this.options.carLightsRadius[0];
+      const length = Math.random() * (this.options.carLightsLength[1] - this.options.carLightsLength[0]) + this.options.carLightsLength[0];
+      const speed = Math.random() * (this.options.movingAwaySpeed[1] - this.options.movingAwaySpeed[0]) + this.options.movingAwaySpeed[0];
+
+      const carWidth = Math.random() * (this.options.carWidthPercentage[1] - this.options.carWidthPercentage[0]) + this.options.carWidthPercentage[0];
+      const carShiftX = Math.random() * (this.options.carShiftX[1] - this.options.carShiftX[0]) + this.options.carShiftX[0];
+      const carFloorSeparation = Math.random() * (this.options.carFloorSeparation[1] - this.options.carFloorSeparation[0]) + this.options.carFloorSeparation[0];
+
+      const offsetY = carFloorSeparation + radius * 2;
+      const offsetX = carShiftX + carWidth * this.options.roadWidth;
+
+      aOffset.push(offsetX - radius, offsetY, i * length);
+      aOffset.push(offsetX + radius, offsetY, i * length);
+
+      aMetrics.push(radius, length, speed);
+      aMetrics.push(radius, length, speed);
+
+      const color = this.options.colors.leftCars[Math.floor(Math.random() * this.options.colors.leftCars.length)];
+      aColor.push(color);
+      aColor.push(color);
+    }
+
+    for (let i = 0; i < this.options.lightPairsPerRoadWay; i++) {
+      const radius = Math.random() * (this.options.carLightsRadius[1] - this.options.carLightsRadius[0]) + this.options.carLightsRadius[0];
+      const length = Math.random() * (this.options.carLightsLength[1] - this.options.carLightsLength[0]) + this.options.carLightsLength[0];
+      const speed = Math.random() * (this.options.movingCloserSpeed[1] - this.options.movingCloserSpeed[0]) + this.options.movingCloserSpeed[0];
+
+      const carWidth = Math.random() * (this.options.carWidthPercentage[1] - this.options.carWidthPercentage[0]) + this.options.carWidthPercentage[0];
+      const carShiftX = Math.random() * (this.options.carShiftX[1] - this.options.carShiftX[0]) + this.options.carShiftX[0];
+      const carFloorSeparation = Math.random() * (this.options.carFloorSeparation[1] - this.options.carFloorSeparation[0]) + this.options.carFloorSeparation[0];
+
+      const offsetY = carFloorSeparation + radius * 2;
+      const offsetX = carShiftX - carWidth * this.options.roadWidth;
+
+      aOffset.push(offsetX - radius, offsetY, i * length);
+      aOffset.push(offsetX + radius, offsetY, i * length);
+
+      aMetrics.push(radius, length, speed);
+      aMetrics.push(radius, length, speed);
+
+      const color = this.options.colors.rightCars[Math.floor(Math.random() * this.options.colors.rightCars.length)];
+      aColor.push(color);
+      aColor.push(color);
+    }
+
+    instanced.setAttribute('aOffset', new THREE.InstancedBufferAttribute(new Float32Array(aOffset), 3, false));
+    instanced.setAttribute('aMetrics', new THREE.InstancedBufferAttribute(new Float32Array(aMetrics), 3, false));
+    instanced.setAttribute('aColor', new THREE.InstancedBufferAttribute(new Uint32Array(aColor), 1, false));
+
+    const material = new THREE.ShaderMaterial({
+      fragmentShader: carLightsFragment,
+      vertexShader: carLightsVertex,
+      transparent: true,
+      uniforms: Object.assign(
+        {
+          uTime: { value: 0 },
+          uColor1: { value: new THREE.Color(this.options.colors.leftCars[0]) },
+          uColor2: { value: new THREE.Color(this.options.colors.leftCars[1]) },
+          uColor3: { value: new THREE.Color(this.options.colors.leftCars[2]) },
+          uFade: { value: this.options.carLightsFade }
+        },
+        distortions[this.options.distortion].uniforms
+      )
+    });
+
+    this.mesh = new THREE.Mesh(instanced, material);
+  }
+
+  update(time) {
+    this.mesh.material.uniforms.uTime.value = time;
+  }
+}
+
+class LightsSticks {
+  constructor(webgl, options) {
+    this.webgl = webgl;
+    this.options = options;
+    this.init();
+  }
+
+  init() {
+    const baseGeometry = new THREE.PlaneGeometry(1, 1);
+    const instanced = new THREE.InstancedBufferGeometry().copy(baseGeometry);
+    instanced.instanceCount = this.options.totalSideLightSticks;
+
+    const aOffset = [];
+    const aColor = [];
+    const aMetrics = [];
+
+    for (let i = 0; i < this.options.totalSideLightSticks; i++) {
+      const width = Math.random() * (this.options.lightStickWidth[1] - this.options.lightStickWidth[0]) + this.options.lightStickWidth[0];
+      const height = Math.random() * (this.options.lightStickHeight[1] - this.options.lightStickHeight[0]) + this.options.lightStickHeight[0];
+
+      aOffset.push((this.options.roadWidth + this.options.islandWidth) * (Math.random() > 0.5 ? 1 : -1), height / 2, i * 20);
+      aColor.push(this.options.colors.sticks);
+      aMetrics.push(width, height);
+    }
+
+    instanced.setAttribute('aOffset', new THREE.InstancedBufferAttribute(new Float32Array(aOffset), 3, false));
+    instanced.setAttribute('aColor', new THREE.InstancedBufferAttribute(new Uint32Array(aColor), 1, false));
+    instanced.setAttribute('aMetrics', new THREE.InstancedBufferAttribute(new Float32Array(aMetrics), 2, false));
+
+    const material = new THREE.ShaderMaterial({
+      fragmentShader: sideSticksFragment,
+      vertexShader: sideSticksVertex,
+      transparent: true,
+      uniforms: Object.assign(
+        {
+          uTime: { value: 0 }
+        },
+        distortions[this.options.distortion].uniforms
+      )
+    });
+
+    this.mesh = new THREE.Mesh(instanced, material);
+  }
+
+  update(time) {
+    this.mesh.material.uniforms.uTime.value = time;
+  }
+}
+
+class Road {
+  constructor(webgl, options) {
+    this.webgl = webgl;
+    this.options = options;
+    this.init();
+  }
+
+  init() {
+    const geometry = this.createPlane(this.options.roadWidth, this.options.length);
+    const material = new THREE.ShaderMaterial({
+      fragmentShader: roadMarkings_fragment,
+      vertexShader: roadVertex,
+      transparent: true,
+      uniforms: Object.assign(
+        {
+          uTime: { value: 0 },
+          uColor: { value: new THREE.Color(this.options.colors.roadColor) },
+          uLength: { value: this.options.length },
+          uRoadWidth: { value: this.options.roadWidth },
+          uIslandWidth: { value: this.options.islandWidth },
+          uLanesPerRoad: { value: this.options.lanesPerRoad },
+          uBrokenLinesColor: { value: new THREE.Color(this.options.colors.brokenLines) },
+          uShoulderLinesColor: { value: new THREE.Color(this.options.colors.shoulderLines) },
+          uShoulderLinesWidthPercentage: { value: this.options.shoulderLinesWidthPercentage },
+          uBrokenLinesLengthPercentage: { value: this.options.brokenLinesLengthPercentage },
+          uBrokenLinesWidthPercentage: { value: this.options.brokenLinesWidthPercentage }
+        },
+        distortions[this.options.distortion].uniforms
+      )
+    });
+
+    this.mesh = new THREE.Mesh(geometry, material);
+  }
+
+  createPlane(width, length) {
+    const geometry = new THREE.PlaneGeometry(width, length, 20, 200);
+    geometry.rotateX(-Math.PI / 2);
+    return geometry;
+  }
+
+  update(time) {
+    this.mesh.material.uniforms.uTime.value = time;
+  }
+}
+
+// Shader definitions
+const carLightsVertex = `
+  #define USE_FOG
+  ${distortions.turbulentDistortion.getDistortion}
+  attribute vec3 aOffset;
+  attribute vec3 aMetrics;
+  attribute float aColor;
+  
+  uniform float uTime;
+  uniform float uSpeed;
+  
+  varying vec2 vUv; 
+  varying vec3 vColor;
+  varying float vProgress;
+  
+  void main() {
+    vec3 transformed = position.xyz;
+    float radius = aMetrics.r;
+    float myLength = aMetrics.g;
+    float speed = aMetrics.b;
+    
+    transformed.xy *= radius;
+    transformed.z *= myLength;
+    
+    // Add my length to make sure it loops after the lights hits the end
+    transformed.z += myLength - mod( uTime *speed + aOffset.z, myLength);
+    transformed.xy += aOffset.xy;
+    
+    float progress = abs(transformed.z / myLength);
+    transformed.xyz += getDistortion(progress);
+    
+    vec4 mvPosition = modelViewMatrix * vec4(transformed, 1.);
+    gl_Position = projectionMatrix * mvPosition;
+    vUv = uv;
+    vProgress = progress;
+  }
+`;
+
+const carLightsFragment = `
+  #define USE_FOG
+  
+  uniform vec3 uColor1;
+  uniform vec3 uColor2; 
+  uniform vec3 uColor3;
+  uniform float uFade;
+  varying vec2 vUv;
+  varying float vProgress;
+  
+  void main() {
+    vec3 color = vec3(vUv.y);
+    float fadeStart = 0.4;
+    float maxFade = 0.8;
+    float alpha = 1.;
+    
+    alpha = smoothstep(fadeStart, maxFade, vProgress);
+    gl_FragColor = vec4(color,alpha);
+  }
+`;
+
+const sideSticksVertex = `
+  #define USE_FOG
+  ${distortions.turbulentDistortion.getDistortion}
+  attribute vec3 aOffset;
+  attribute float aColor;
+  attribute vec2 aMetrics;
+  
+  varying vec2 vUv; 
+  varying vec3 vColor;
+  
+  void main() {
+    vec3 transformed = position.xyz;
+    float width = aMetrics.x;
+    float height = aMetrics.y;
+    
+    transformed.xy *= vec2(width, height);
+    transformed.z += aOffset.z - mod(uTime * 20.0 + aOffset.z, 40.);
+    transformed.xy += aOffset.xy;
+    
+    float progress = abs(transformed.z / 20.);
+    transformed.xyz += getDistortion(progress);
+    
+    vec4 mvPosition = modelViewMatrix * vec4(transformed, 1.);
+    gl_Position = projectionMatrix * mvPosition;
+    vUv = uv;
+  }
+`;
+
+const sideSticksFragment = `
+  #define USE_FOG
+  
+  varying vec2 vUv;
+  
+  void main() {
+    vec3 color = vec3(0.03, 0.7, 0.76);
+    float alpha = 1.;
+    gl_FragColor = vec4(color,alpha);
+  }
+`;
+
+const roadMarkings_fragment = `
+  #define USE_FOG
+  uniform vec3 uColor;
+  uniform float uLength;
+  uniform float uRoadWidth;
+  uniform float uIslandWidth; 
+  uniform float uLanesPerRoad;
+  uniform vec3 uBrokenLinesColor;
+  uniform vec3 uShoulderLinesColor;
+  uniform float uShoulderLinesWidthPercentage;
+  uniform float uBrokenLinesWidthPercentage;
+  uniform float uBrokenLinesLengthPercentage;
+  
+  varying vec2 vUv;
+  varying float vProgress;
+  
+  void main() {
+    vec3 color = uColor;
+    float roadWidth = uRoadWidth;
+    float islandWidth = uIslandWidth;
+    float x = vUv.x;
+    float y = vUv.y;
+    
+    // Broken lines
+    if(mod(y*uLength, 40.) > 40. * uBrokenLinesLengthPercentage){
+      float brokenLineWidth = uBrokenLinesWidthPercentage;
+      
+      // Left road
+      if(x >= (0.5 - brokenLineWidth * 0.5) && x <= (0.5 + brokenLineWidth * 0.5) && x < (0.5 - islandWidth/(roadWidth*2.))){
+        color = uBrokenLinesColor;
+      }
+      // Right road  
+      if(x >= (0.5 - brokenLineWidth * 0.5) && x <= (0.5 + brokenLineWidth * 0.5) && x > (0.5 + islandWidth/(roadWidth*2.))){
+        color = uBrokenLinesColor;
+      }
+    }
+    
+    gl_FragColor = vec4(color,1.);
+  }
+`;
+
+const roadVertex = `
+  #define USE_FOG
+  ${distortions.turbulentDistortion.getDistortion}
+  
+  varying vec2 vUv;
+  varying float vProgress;
+  
+  void main() {
+    vec3 transformed = position.xyz;
+    
+    float progress = (transformed.z + 200.) / 400.;
+    transformed.xyz += getDistortion(progress);
+    
+    vec4 mvPosition = modelViewMatrix * vec4(transformed, 1.);
+    gl_Position = projectionMatrix * mvPosition;
+    vUv = uv;
+    vProgress = progress;
+  }
+`;
+
+const Hyperspeed = ({ effectOptions = {
+  onSpeedUp: () => { },
+  onSlowDown: () => { },
+  distortion: 'turbulentDistortion',
+  length: 400,
+  roadWidth: 10,
+  islandWidth: 2,
+  lanesPerRoad: 4,
+  fov: 90,
+  fovSpeedUp: 150,
+  speedUp: 2,
+  carLightsFade: 0.4,
+  totalSideLightSticks: 20,
+  lightPairsPerRoadWay: 40,
+  shoulderLinesWidthPercentage: 0.05,
+  brokenLinesWidthPercentage: 0.1,
+  brokenLinesLengthPercentage: 0.5,
+  lightStickWidth: [0.12, 0.5],
+  lightStickHeight: [1.3, 1.7],
+  movingAwaySpeed: [60, 80],
+  movingCloserSpeed: [-120, -160],
+  carLightsLength: [400 * 0.03, 400 * 0.2],
+  carLightsRadius: [0.05, 0.14],
+  carWidthPercentage: [0.3, 0.5],
+  carShiftX: [-0.8, 0.8],
+  carFloorSeparation: [0, 5],
+  colors: {
+    roadColor: 0x080808,
+    islandColor: 0x0a0a0a,
+    background: 0x000000,
+    shoulderLines: 0xFFFFFF,
+    brokenLines: 0xFFFFFF,
+    leftCars: [0xD856BF, 0x6750A2, 0xC247AC],
+    rightCars: [0x03B3C3, 0x0E5EA5, 0x324555],
+    sticks: 0x03B3C3,
+  }
+} }) => {
+  const hyperspeed = useRef(null);
+  const appRef = useRef(null);
+  
+  useEffect(() => {
+    if (appRef.current) {
+      appRef.current.dispose();
+      const container = document.getElementById('lights');
+      if (container) {
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
+        }
+      }
+    }
+
+    const container = hyperspeed.current;
+    if (!container) return;
+
+    const myApp = new App(container, effectOptions);
+    appRef.current = myApp;
+    myApp.loadAssets().then(() => myApp.init());
+
+    return () => {
+      if (appRef.current) {
+        appRef.current.dispose();
+      }
+    };
+  }, [effectOptions]);
+
+  return (
+    <div id="lights" ref={hyperspeed}></div>
+  );
+};
+
+export default Hyperspeed;

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 415 335" width="415" height="335">
+  <!-- Folder back part -->
+  <path d="M20 55 C20 45, 30 35, 40 35 L180 35 L200 55 L395 55 C405 55, 415 65, 415 75 L415 315 C415 325, 405 335, 395 335 L40 335 C30 335, 20 325, 20 315 Z" fill="#F5C842" stroke="#E6B73A" stroke-width="2"/>
+  
+  <!-- Folder tab -->
+  <path d="M40 35 C30 35, 20 45, 20 55 L20 85 L200 85 L220 65 L220 55 L200 35 Z" fill="#F2B632" stroke="#E6B73A" stroke-width="2"/>
+  
+  <!-- Folder front part -->
+  <rect x="20" y="85" width="375" height="230" rx="20" ry="20" fill="#FFD700" stroke="#E6B73A" stroke-width="2"/>
+  
+  <!-- White label area -->
+  <rect x="40" y="105" width="335" height="30" rx="5" ry="5" fill="#FFFFFF" stroke="#E6E6E6" stroke-width="1"/>
+  
+  <!-- Subtle shadow/depth -->
+  <ellipse cx="207" cy="320" rx="180" ry="15" fill="rgba(0,0,0,0.1)"/>
+</svg>

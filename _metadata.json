@@ -1,0 +1,82 @@
+{
+  "hash": "a7e6e988",
+  "configHash": "199f60b0",
+  "lockfileHash": "2175cf03",
+  "browserHash": "f123455f",
+  "optimized": {
+    "react": {
+      "src": "../../react/index.js",
+      "file": "react.js",
+      "fileHash": "79a6ed3c",
+      "needsInterop": true
+    },
+    "react-dom": {
+      "src": "../../react-dom/index.js",
+      "file": "react-dom.js",
+      "fileHash": "cd335668",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "4d3ff23f",
+      "needsInterop": true
+    },
+    "react/jsx-runtime": {
+      "src": "../../react/jsx-runtime.js",
+      "file": "react_jsx-runtime.js",
+      "fileHash": "0ebe9d9d",
+      "needsInterop": true
+    },
+    "gsap": {
+      "src": "../../gsap/index.js",
+      "file": "gsap.js",
+      "fileHash": "3686930f",
+      "needsInterop": false
+    },
+    "gsap/ScrollTrigger": {
+      "src": "../../gsap/ScrollTrigger.js",
+      "file": "gsap_ScrollTrigger.js",
+      "fileHash": "6dc3b46b",
+      "needsInterop": false
+    },
+    "gsap/SplitText": {
+      "src": "../../gsap/SplitText.js",
+      "file": "gsap_SplitText.js",
+      "fileHash": "6dc6cbcd",
+      "needsInterop": false
+    },
+    "postprocessing": {
+      "src": "../../postprocessing/build/index.js",
+      "file": "postprocessing.js",
+      "fileHash": "6250b59c",
+      "needsInterop": false
+    },
+    "react-dom/client": {
+      "src": "../../react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "cdbe0838",
+      "needsInterop": true
+    },
+    "three": {
+      "src": "../../three/build/three.module.js",
+      "file": "three.js",
+      "fileHash": "b201d26c",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-D2CFZQ47": {
+      "file": "chunk-D2CFZQ47.js"
+    },
+    "chunk-3KUYDGL5": {
+      "file": "chunk-3KUYDGL5.js"
+    },
+    "chunk-TLNGBK35": {
+      "file": "chunk-TLNGBK35.js"
+    },
+    "chunk-BUSYA2B4": {
+      "file": "chunk-BUSYA2B4.js"
+    }
+  }
+}
